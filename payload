@@ -1,0 +1,21 @@
+1.
+<noscript>
+  </noscript>
+  <img src=x1 onerror=eval(atob('<Base64-Payload-From-Step-7>'))>
+</noscript>
+
+1️⃣ 外层 <noscript> 标签 — 解析上下文切换（Context Switching）
+元素	作用
+<noscript>	在 JavaScript 禁用时，浏览器将其内容作为 HTML 渲染；在 JS 启用时，内容作为纯文本处理
+</noscript> 写在属性值内部	若渲染器将 noscript 内容视为原始文本，这个 </noscript> 会提前关闭外层 noscript 标签
+攻击效果： 某些 HTML 解析器或 sanitizer 在处理 noscript 内容时存在状态机差异，导致后续的 <img> 标签逃逸到正常 HTML 上下文中被解析执行。
+
+2️⃣ <img src=x1 onerror=...> — 事件触发载体
+src=x1：指向一个必然加载失败的资源，强制触发 onerror 事件
+onerror=eval(...)：在图片加载失败时执行任意 JavaScript
+
+3️⃣ eval(atob('<Base64>')) — Payload 混淆
+函数	作用
+atob()	将 Base64 字符串解码为原始字符串
+eval()	将解码后的字符串作为 JavaScript 动态执行
+目的： 绕过基于关键字的静态过滤（如检测 alert、document.cookie 等字符串），将真实恶意代码隐藏在 Base64 中。
